@@ -19,23 +19,15 @@ namespace MCBA.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Set check constraints (cannot be expressed with data annotations).
+            modelBuilder.Entity<Login>().ToTable(b =>
+            {
+                b.HasCheckConstraint("CH_Login_LoginID", "len(LoginID) = 8");
+                b.HasCheckConstraint("CH_Login_PasswordHash", "len(PasswordHash) = 94");
+            });
 
-            base.OnModelCreating(modelBuilder);
-
-            // Configure one-to-many relationship for source account
-            modelBuilder.Entity<Account>()
-                .HasMany(a => a.Transactions)
-                .WithOne(t => t.Account)
-                .HasForeignKey(t => t.AccountNumber)
-                .OnDelete(DeleteBehavior.Cascade); // Or use .Restrict based on
-
-
-            // Configure one-to-many relationship for destination account
-            modelBuilder.Entity<Account>()
-                .HasMany(a => a.DestinationTransactions)
-                .WithOne(t => t.DestinationAccount)
-                .HasForeignKey(t => t.DestinationAccountNumber)
-                .OnDelete(DeleteBehavior.ClientSetNull); // Prevent cascade delete for the destination account
+            modelBuilder.Entity<Account>().ToTable(b => b.HasCheckConstraint("CH_Account_Balance", "Balance >= 0"));
+            modelBuilder.Entity<Transaction>().ToTable(b => b.HasCheckConstraint("CH_Transaction_Amount", "Amount > 0"));
 
         }
     }

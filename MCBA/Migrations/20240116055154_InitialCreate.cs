@@ -15,8 +15,7 @@ namespace MCBA.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    CustomerID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CustomerID = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     City = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
@@ -50,13 +49,14 @@ namespace MCBA.Migrations
                 columns: table => new
                 {
                     AccountNumber = table.Column<int>(type: "int", nullable: false),
-                    AccountType = table.Column<int>(type: "int", nullable: false),
+                    AccountType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CustomerID = table.Column<int>(type: "int", nullable: false),
                     Balance = table.Column<decimal>(type: "money", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Accounts", x => x.AccountNumber);
+                    table.CheckConstraint("CH_Account_Balance", "Balance >= 0");
                     table.ForeignKey(
                         name: "FK_Accounts_Customers_CustomerID",
                         column: x => x.CustomerID,
@@ -76,6 +76,8 @@ namespace MCBA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Logins", x => x.LoginID);
+                    table.CheckConstraint("CH_Login_LoginID", "len(LoginID) = 8");
+                    table.CheckConstraint("CH_Login_PasswordHash", "len(PasswordHash) = 94");
                     table.ForeignKey(
                         name: "FK_Logins_Customers_CustomerID",
                         column: x => x.CustomerID,
@@ -95,7 +97,7 @@ namespace MCBA.Migrations
                     PayeeID = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<decimal>(type: "money", nullable: false),
                     ScheduleTimeUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Period = table.Column<int>(type: "int", nullable: false)
+                    Period = table.Column<string>(type: "nvarchar(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -118,9 +120,8 @@ namespace MCBA.Migrations
                 name: "Transactions",
                 columns: table => new
                 {
-                    TransactionID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TransactionType = table.Column<int>(type: "int", nullable: false),
+                    TransactionID = table.Column<int>(type: "int", nullable: false),
+                    TransactionType = table.Column<string>(type: "nvarchar(1)", nullable: false),
                     AccountNumber = table.Column<int>(type: "int", nullable: false),
                     DestinationAccountNumber = table.Column<int>(type: "int", nullable: true),
                     Amount = table.Column<decimal>(type: "money", nullable: false),
@@ -130,6 +131,7 @@ namespace MCBA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Transactions", x => x.TransactionID);
+                    table.CheckConstraint("CH_Transaction_Amount", "Amount > 0");
                     table.ForeignKey(
                         name: "FK_Transactions_Accounts_AccountNumber",
                         column: x => x.AccountNumber,
@@ -161,7 +163,8 @@ namespace MCBA.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Logins_CustomerID",
                 table: "Logins",
-                column: "CustomerID");
+                column: "CustomerID",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_AccountNumber",

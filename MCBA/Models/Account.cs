@@ -4,12 +4,6 @@ using System.Collections.Generic;
 
 namespace MCBA.Models
 {
-    public enum AccountType
-    {
-        Checking = 'C',
-        Saving = 'S'
-    }
-
     public class Account
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -17,25 +11,19 @@ namespace MCBA.Models
         public int AccountNumber { get; set; }
 
         [Display(Name = "Type")]
-        public AccountType AccountType { get; set; }
+        public string AccountType { get; set; }
 
-        public int CustomerID { get; set; }
+        public int CustomerID { get; set; }  // FK constraint
+        public virtual Customer Customer { get; set; } // nav property
 
         [Column(TypeName = "money")]
         [DataType(DataType.Currency)]
         public decimal Balance { get; set; }
 
-        // Navigation properties
-        public virtual Customer Customer { get; set; }
-
-        // Transactions where this account is the source
+        [InverseProperty("Account")]
         public virtual List<Transaction> Transactions { get; set; }
 
-        // Transactions where this account is the destination
-        [InverseProperty("DestinationAccount")]
-        public virtual List<Transaction> DestinationTransactions { get; set; }
-
-        // BillPays associated with this account
+        [InverseProperty("Account")]
         public virtual List<BillPay> BillPays { get; set; }
     }
 }

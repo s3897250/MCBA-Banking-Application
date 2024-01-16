@@ -5,14 +5,15 @@ namespace MCBA.Models;
 
 public class Login
 {
-    [Key, StringLength(8)]
+    [StringLength(8)]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public string LoginID { get; set; }
 
     public int CustomerID { get; set; }
+    public virtual Customer Customer { get; set; } // Nav property
 
     [Required, StringLength(94)]
     public string PasswordHash { get; set; }
+    
 
-    // Navigation property
-    public virtual Customer Customer { get; set; }
 }

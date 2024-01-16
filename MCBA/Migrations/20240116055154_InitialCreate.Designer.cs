@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MCBA.Migrations
 {
     [DbContext(typeof(MCBAContext))]
-    [Migration("20240115210708_InitialCreate")]
+    [Migration("20240116055154_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -30,8 +30,9 @@ namespace MCBA.Migrations
                     b.Property<int>("AccountNumber")
                         .HasColumnType("int");
 
-                    b.Property<int>("AccountType")
-                        .HasColumnType("int");
+                    b.Property<string>("AccountType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Balance")
                         .HasColumnType("money");
@@ -43,7 +44,10 @@ namespace MCBA.Migrations
 
                     b.HasIndex("CustomerID");
 
-                    b.ToTable("Accounts");
+                    b.ToTable("Accounts", t =>
+                        {
+                            t.HasCheckConstraint("CH_Account_Balance", "Balance >= 0");
+                        });
                 });
 
             modelBuilder.Entity("MCBA.Models.BillPay", b =>
@@ -66,8 +70,9 @@ namespace MCBA.Migrations
                     b.Property<int>("PayeeID")
                         .HasColumnType("int");
 
-                    b.Property<int>("Period")
-                        .HasColumnType("int");
+                    b.Property<string>("Period")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(1)");
 
                     b.Property<DateTime>("ScheduleTimeUtc")
                         .HasColumnType("datetime2");
@@ -84,10 +89,7 @@ namespace MCBA.Migrations
             modelBuilder.Entity("MCBA.Models.Customer", b =>
                 {
                     b.Property<int>("CustomerID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerID"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -130,9 +132,15 @@ namespace MCBA.Migrations
 
                     b.HasKey("LoginID");
 
-                    b.HasIndex("CustomerID");
+                    b.HasIndex("CustomerID")
+                        .IsUnique();
 
-                    b.ToTable("Logins");
+                    b.ToTable("Logins", t =>
+                        {
+                            t.HasCheckConstraint("CH_Login_LoginID", "len(LoginID) = 8");
+
+                            t.HasCheckConstraint("CH_Login_PasswordHash", "len(PasswordHash) = 94");
+                        });
                 });
 
             modelBuilder.Entity("MCBA.Models.Payee", b =>
@@ -181,10 +189,7 @@ namespace MCBA.Migrations
             modelBuilder.Entity("MCBA.Models.Transaction", b =>
                 {
                     b.Property<int>("TransactionID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionID"));
 
                     b.Property<int>("AccountNumber")
                         .HasColumnType("int");
@@ -203,8 +208,9 @@ namespace MCBA.Migrations
                     b.Property<DateTime>("TransactionTimeUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TransactionType")
-                        .HasColumnType("int");
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(1)");
 
                     b.HasKey("TransactionID");
 
@@ -212,7 +218,10 @@ namespace MCBA.Migrations
 
                     b.HasIndex("DestinationAccountNumber");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", t =>
+                        {
+                            t.HasCheckConstraint("CH_Transaction_Amount", "Amount > 0");
+                        });
                 });
 
             modelBuilder.Entity("MCBA.Models.Account", b =>
@@ -248,8 +257,8 @@ namespace MCBA.Migrations
             modelBuilder.Entity("MCBA.Models.Login", b =>
                 {
                     b.HasOne("MCBA.Models.Customer", "Customer")
-                        .WithMany("Logins")
-                        .HasForeignKey("CustomerID")
+                        .WithOne("Login")
+                        .HasForeignKey("MCBA.Models.Login", "CustomerID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -265,7 +274,7 @@ namespace MCBA.Migrations
                         .IsRequired();
 
                     b.HasOne("MCBA.Models.Account", "DestinationAccount")
-                        .WithMany("DestinationTransactions")
+                        .WithMany()
                         .HasForeignKey("DestinationAccountNumber");
 
                     b.Navigation("Account");
@@ -277,8 +286,6 @@ namespace MCBA.Migrations
                 {
                     b.Navigation("BillPays");
 
-                    b.Navigation("DestinationTransactions");
-
                     b.Navigation("Transactions");
                 });
 
@@ -286,7 +293,8 @@ namespace MCBA.Migrations
                 {
                     b.Navigation("Accounts");
 
-                    b.Navigation("Logins");
+                    b.Navigation("Login")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
