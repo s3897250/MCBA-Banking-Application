@@ -19,6 +19,9 @@ namespace MCBA.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            base.OnModelCreating(modelBuilder);
+
             // Set check constraints (cannot be expressed with data annotations).
             modelBuilder.Entity<Login>().ToTable(b =>
             {

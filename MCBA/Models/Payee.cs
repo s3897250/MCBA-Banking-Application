@@ -5,6 +5,7 @@ namespace MCBA.Models;
 
 public class Payee
 {
+    [Key]
     public int PayeeID { get; set; }
 
     [Required, StringLength(50)]

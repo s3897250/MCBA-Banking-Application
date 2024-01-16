@@ -28,46 +28,63 @@ namespace MCBA.Data
                 DateFormatString = "dd/MM/yyyy hh:mm:ss tt",
             });
 
-            // Insert data into the database
+
+            // Database loading
+
             foreach (var customer in customers)
             {
-                // Add customer to the context
+                // Add the customer to the context
                 context.Customers.Add(customer);
 
                 foreach (var account in customer.Accounts)
                 {
-                    // Set CustomerID for the account and add it to the context
+                    // Set the foreign key for the account
                     account.CustomerID = customer.CustomerID;
-                    context.Accounts.Add(account);
 
-                    var balanceTotal = 0M;
+                    // Check if the account already exists to avoid primary key violation
+                    if (!context.Accounts.Any(a => a.AccountNumber == account.AccountNumber))
+                    {
+                        context.Accounts.Add(account);
+                    }
+
+                    var balanceTotal = 0M; // Initialize balance total
 
                     foreach (var transaction in account.Transactions)
                     {
-                        // Set AccountNumber and TransactionType for the transaction
+                        // Set required properties for the transaction
                         transaction.AccountNumber = account.AccountNumber;
-                        transaction.TransactionType = TransactionType.Deposit; // Assuming all transactions are deposits
+                        transaction.TransactionType = 'D'; // Assume all transactions are deposits
 
-                        // Add transaction amount to balance total and add transaction to the context
+                        // Update the running total balance
                         balanceTotal += transaction.Amount;
-                        context.Transactions.Add(transaction);
+
+                        // Check if the transaction already exists to avoid primary key violation
+                        if (!context.Transactions.Any(t => t.TransactionID == transaction.TransactionID))
+                        {
+                            context.Transactions.Add(transaction);
+                        }
                     }
 
-                    // After transactions are inserted, update the account's balance
+                    // Update the balance for the account
                     account.Balance = balanceTotal;
                 }
 
-                // Check if the customer has a login before adding it to the database
-                if (customer.Login != null)
+                // Set foreign key for the customer's login
+                customer.Login.CustomerID = customer.CustomerID;
+
+                // Check if the login already exists to avoid primary key violation
+                if (!context.Logins.Any(l => l.LoginID == customer.Login.LoginID))
                 {
-                    // Set CustomerID for the login and add it to the context
-                    customer.Login.CustomerID = customer.CustomerID;
                     context.Logins.Add(customer.Login);
                 }
             }
 
-            // Save all changes at the end
+            // Save all changes at once after processing all entities
             context.SaveChanges();
+
+
+
+
         }
     }
 }

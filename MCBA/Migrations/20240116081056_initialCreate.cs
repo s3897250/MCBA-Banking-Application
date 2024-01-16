@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MCBA.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,9 +17,9 @@ namespace MCBA.Migrations
                 {
                     CustomerID = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    City = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
-                    PostCode = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false)
+                    Address = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    City = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true),
+                    PostCode = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -120,12 +120,13 @@ namespace MCBA.Migrations
                 name: "Transactions",
                 columns: table => new
                 {
-                    TransactionID = table.Column<int>(type: "int", nullable: false),
+                    TransactionID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     TransactionType = table.Column<string>(type: "nvarchar(1)", nullable: false),
                     AccountNumber = table.Column<int>(type: "int", nullable: false),
                     DestinationAccountNumber = table.Column<int>(type: "int", nullable: true),
                     Amount = table.Column<decimal>(type: "money", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
                     TransactionTimeUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
