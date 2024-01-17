@@ -5,7 +5,6 @@ namespace MCBA.Models;
 
 public class BillPay
 {
-    [Key]
     public int BillPayID { get; set; }
 
     [Required]

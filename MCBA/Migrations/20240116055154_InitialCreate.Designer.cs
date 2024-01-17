@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MCBA.Migrations
 {
     [DbContext(typeof(MCBAContext))]
-    [Migration("20240116081056_initialCreate")]
-    partial class initialCreate
+    [Migration("20240116055154_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -92,10 +92,12 @@ namespace MCBA.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("City")
+                        .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("nvarchar(40)");
 
@@ -105,6 +107,7 @@ namespace MCBA.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PostCode")
+                        .IsRequired()
                         .HasMaxLength(4)
                         .HasColumnType("nvarchar(4)");
 
@@ -186,10 +189,7 @@ namespace MCBA.Migrations
             modelBuilder.Entity("MCBA.Models.Transaction", b =>
                 {
                     b.Property<int>("TransactionID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionID"));
 
                     b.Property<int>("AccountNumber")
                         .HasColumnType("int");
@@ -198,6 +198,7 @@ namespace MCBA.Migrations
                         .HasColumnType("money");
 
                     b.Property<string>("Comment")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 

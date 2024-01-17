@@ -6,7 +6,7 @@ namespace MCBA.Models;
 public class Login
 {
     [StringLength(8)]
-    [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public string LoginID { get; set; }
 
     public int CustomerID { get; set; }

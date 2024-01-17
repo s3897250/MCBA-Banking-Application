@@ -5,8 +5,7 @@ namespace MCBA.Models;
 
 public class Transaction
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int TransactionID { get; set; }
 
     [Required]
@@ -24,7 +23,7 @@ public class Transaction
     public decimal Amount { get; set; }
 
     [StringLength(30)]
-    public string? Comment { get; set; }
+    public string Comment { get; set; }
 
     public DateTime TransactionTimeUtc { get; set; }
 }

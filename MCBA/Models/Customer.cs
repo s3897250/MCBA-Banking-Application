@@ -6,20 +6,20 @@ namespace MCBA.Models
 {
 public class Customer
 {
-    [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int CustomerID { get; set; }
 
     [Required, StringLength(50)]
     public string Name { get; set; }
 
     [StringLength(50)]
-    public string? Address { get; set; }
+    public string Address { get; set; }
 
     [StringLength(40)]
-    public string? City { get; set; }
+    public string City { get; set; }
 
     [StringLength(4)]
-    public string? PostCode { get; set; }
+    public string PostCode { get; set; }
 
     // Navigation properties
     public virtual List<Account> Accounts { get; set; }
