@@ -1,0 +1,20 @@
+@model Account
+@{
+    ViewData["Title"] = "Withdraw";
+}
+
+<h1 class="display-4">@*Account Number @Model.AccountNumber (@Model.AccountType)*@</h1>
+
+<div class="row">
+    <div class="col-md-4">
+
+        <form asp-action="Withdraw">
+        </form>
+
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to Accounts</a>
+</div>
+
