@@ -32,7 +32,7 @@ public class CustomerController : Controller
         // Routes to Deposit Page
         return View(await _context.Accounts.FindAsync(id));
     }
-    4
+    
     [HttpPost]
     public async Task<IActionResult> Deposit(int id, decimal amount)
     {
