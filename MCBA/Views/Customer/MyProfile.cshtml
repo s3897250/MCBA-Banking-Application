@@ -1,0 +1,24 @@
+﻿@model Customer
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="container">
+    <dl class="row">
+        <dt class="col-sm-3">Name:</dt>
+        <dd class="col-sm-9">@Model.Name</dd>
+
+        <dt class="col-sm-3">Address:</dt>
+        <dd class="col-sm-9">@Model.Address</dd>
+
+        <dt class="col-sm-3">City:</dt>
+        <dd class="col-sm-9">@Model.City</dd>
+
+        <dt class="col-sm-3">PostCode:</dt>
+        <dd class="col-sm-9">@Model.PostCode</dd>
+    </dl>
+    <a href="@Url.Action("EditProfile", "Customer")" class="btn btn-primary">Edit Profile</a>
+    <a href="@Url.Action("ChangePassword", "Customer")" class="btn btn-secondary">Change Password</a>
+</div>
