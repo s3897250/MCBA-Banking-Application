@@ -1,0 +1,39 @@
+﻿@model Customer
+@{
+    ViewData["Title"] = "Accounts";
+}
+<h2>Your Accounts</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(x => x.Accounts[0].AccountNumber)</th>
+            <th>@Html.DisplayNameFor(x => x.Accounts[0].AccountType)</th>
+            <th>@Html.DisplayNameFor(x => x.Accounts[0].Balance)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var account in Model.Accounts)
+        {
+            <tr>
+                <td>@Html.DisplayFor(x => account.AccountNumber)</td>
+                <td>
+                    @if (account.AccountType == "S")
+                    {
+                        @:Savings
+                    }
+                    else if (account.AccountType == "C")
+                    {
+                        @:Checking
+                    }
+                    else
+                    {
+                        @:Unknown
+                    }
+                </td>
+                <td>@Html.DisplayFor(x => account.Balance)</td>
+            </tr>
+        }
+    </tbody>
+</table>
