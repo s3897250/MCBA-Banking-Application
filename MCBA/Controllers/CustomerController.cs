@@ -4,7 +4,8 @@ using MCBA.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using SimpleHashing.Net;
+using MCBA.Utilities;
 
 namespace MCBA.Controllers;
 public class CustomerController : Controller
@@ -13,6 +14,8 @@ public class CustomerController : Controller
 
     // ReSharper disable once PossibleInvalidOperationException
     private int? CustomerID => HttpContext.Session.GetInt32(nameof(Customer.CustomerID));
+    private static readonly ISimpleHash s_simpleHash = new SimpleHash();
+
 
     public CustomerController(MCBAContext context)
     {
@@ -29,6 +32,7 @@ public class CustomerController : Controller
         }
         return await _context.Customers
                              .Include(x => x.Accounts)
+                             .Include(x => x.Login)
                              .FirstOrDefaultAsync(x => x.CustomerID == CustomerID);
     }
 
@@ -92,14 +96,44 @@ public class CustomerController : Controller
             customer.PostCode = model.PostCode;
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            return RedirectToAction("MyProfile");
         }
 
         return NotFound();
     }
+    [HttpGet]
+    public IActionResult ChangePassword()
+    {
+        return View();
+    }
 
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            // Return the view with the existing validation error messages from data annotations
+            return View(model);
+        }
 
+        var customer = await GetCustomer();
 
+        if (!s_simpleHash.Verify(model.OldPassword, customer.Login.PasswordHash))
+        {
+            ModelState.AddModelError("CustomError", "The old password is incorrect.");
+            return View(model);
+        }
+        string hashedNewPassword = s_simpleHash.Compute(model.NewPassword);
 
+        if (model.NewPassword != model.ConfirmPassword)
+        {
+            ModelState.AddModelError("CustomError", "The entered passwords don't match.");
+            return View(model);
+        }
 
+        customer.Login.PasswordHash = hashedNewPassword;
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("MyProfile");
+    }
 }
