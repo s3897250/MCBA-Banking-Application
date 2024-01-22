@@ -1,16 +1,61 @@
-@model Account
+@model MCBA.ViewModels.TransferViewModel
 @{
     ViewData["Title"] = "Transfer";
 }
 
-<h1 class="display-4">@*Account Number @Model.AccountNumber (@Model.AccountType)*@</h1>
+<h1 class="display-4">Account Number @Model.AccountNumber (@Model.Account.AccountType)</h1>
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
+        <h1>Transfer to</h1>
+        <table class="table">
+            <tr>
+                <th>@Html.DisplayNameFor(x => x.Account.AccountNumber)</th>
+                <th>@Html.DisplayNameFor(x => x.Account.AccountType)</th>
+                <th>@Html.DisplayNameFor(x => x.Account.Balance)</th>
+                <th>Actions</th>
+            </tr>
 
-        <form asp-action="Transfer">
-        </form>
+            @foreach (var account in Model.GlobalAccounts)
+            {
+            <tr>
+                <td>@Html.DisplayFor(x => account.AccountNumber)</td>
+                <td>@Html.DisplayFor(x => account.AccountType)</td>
+                <td>@Html.DisplayFor(x => account.Balance)</td>
+                <td>
+                    <button class="btn btn-primary" onclick="toggleTransferForm('@account.AccountNumber')">Transfer</button>
+                </td>
+            </tr>
+            <tr id="form-@account.AccountNumber" class="transfer-form" style="display:none;">
+                <td colspan="4">
 
+                    <form asp-action="Transfer">
+                        <input type="hidden" asp-for="AccountNumber" />
+                        <input type="hidden" name="DestinationAccountNumber" value="@account.AccountNumber" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="form-group">
+                            <label asp-for="Amount" class="control-label">Amount</label>
+                            <input asp-for="Amount" class="form-control" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Comment" class="control-label">Comment</label>
+                            <input asp-for="Comment" class="form-control" />
+                            <span asp-validation-for="Comment" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="submit" value="Transfer" class="btn btn-primary" />
+                        </div>
+                    </form>
+
+                </td>
+            </tr>
+            }
+        </table>
     </div>
 </div>
 
@@ -18,3 +63,19 @@
     <a asp-action="Index">Back to Accounts</a>
 </div>
 
+@section Scripts {
+    <script>
+        function toggleTransferForm(accountNumber) {
+            var forms = document.querySelectorAll('.transfer-form');
+            forms.forEach(function (form) {
+                if (form.id !== 'form-' + accountNumber) {
+                    form.style.display = 'none';
+                }
+            });
+
+            var formId = 'form-' + accountNumber;
+            var form = document.getElementById(formId);
+            form.style.display = form.style.display === 'none' ? '' : 'none';
+        }
+    </script>
+}
