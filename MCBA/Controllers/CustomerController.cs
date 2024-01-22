@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SimpleHashing.Net;
-using MCBA.Utilities;
 
 namespace MCBA.Controllers;
 public class CustomerController : Controller
