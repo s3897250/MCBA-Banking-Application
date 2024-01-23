@@ -38,20 +38,20 @@
                             }
                             @if (isLoggedIn)
                             {
-                                <li class="nav-item">
-                                    <span class="nav-link text-dark">
-                                        Welcome, @Context.Session.GetString(nameof(Customer.Name))
-                                    </span>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Login" asp-action="Logout">Logout</a>
-                                </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Customer" asp-action="Index">
+                                    Welcome, @Context.Session.GetString(nameof(Customer.Name))
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Login" asp-action="Logout">Logout</a>
+                            </li>
                             }
                             else
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Login" asp-action="Login">Login</a>
-                                </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Login" asp-action="Login">Login</a>
+                            </li>
                             }
                         </li>
 
