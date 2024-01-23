@@ -23,7 +23,8 @@ public class BillPay
     [Required]
     public DateTime ScheduleTimeUtc { get; set; }
 
-    // New attribute (to check for "Failure", and flag it as such, if bill cant be paid)
+    // Attribute (to check for "Failure", and flag it as such, if bill cant be paid)
+    public bool IsFailed { get; set; }
 
     [Required]
     public char Period { get; set; }

@@ -1,0 +1,49 @@
+@model MCBA.Models.Account
+
+@{
+    ViewData["Title"] = "Scheduled Payments for Account " + Model.AccountNumber;
+}
+
+<div class="text-center">
+
+    <h2>@ViewData["Title"]</h2>
+
+    @if (Model.BillPays != null && Model.BillPays.Any())
+    {
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Bill ID</th>
+                <th>Payee</th>
+                <th>Amount</th>
+                <th>Schedule Time (UTC)</th>
+                <th>Period</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var billPay in Model.BillPays)
+            {
+            <tr>
+                <td>@billPay.BillPayID</td>
+                <td>@billPay.Payee.Name</td>
+                <td>@billPay.Amount.ToString("C")</td>
+                <td>@billPay.ScheduleTimeUtc.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@(billPay.Period == 'M' ? "Monthly" : "One-Off")</td>
+                <td>
+                    @*<a asp-action="Edit" asp-route-id="@billPay.BillPayID">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@billPay.BillPayID">Delete</a>*@
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    }
+    else
+    {
+    <p>No scheduled payments found for this account.</p>
+    }
+
+    <a asp-action="Create" asp-route-accountId="@Model.AccountNumber">Schedule New Payment</a>
+
+</div>
