@@ -11,6 +11,15 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<MCBAContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MCBAContext")));
 
+// Store session into Web-Server memory.
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    // Make the session cookie essential.
+    options.Cookie.IsEssential = true;
+});
+
+
 var app = builder.Build();
 
 // Seed data.
@@ -41,12 +50,13 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"
+    pattern: "{controller=Login}/{action=Login}/{id?}");
 );
+
 
 app.Run();
