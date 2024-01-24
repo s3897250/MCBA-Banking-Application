@@ -142,17 +142,6 @@ public class CustomerController : Controller
         return RedirectToAction("MyProfile");
     }
 
-    //public async Task<IActionResult> Index()
-    //{
-
-    //    // Renders Customer object from Session/Context
-    //    // Renders ATM Operations
-
-    //    var customer = await _context.Customers.Include(x => x.Accounts).
-    //        FirstOrDefaultAsync(x => x.CustomerID == 2100);
-
-    //    return View(customer);
-    //}
 
     public async Task<IActionResult> Deposit(int id)  // id -> AccountNumber
     {

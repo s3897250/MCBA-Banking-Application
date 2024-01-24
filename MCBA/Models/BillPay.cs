@@ -9,8 +9,9 @@ public class BillPay
     public int BillPayID { get; set; }
 
     [Required]
+    [ForeignKey("Account")]
     public int AccountNumber { get; set; }
-    public Account Account { get; set; }
+    public virtual Account Account { get; set; }
 
     [Required]
     public int PayeeID { get; set; }
@@ -25,6 +26,8 @@ public class BillPay
 
     // Attribute (to check for "Failure", and flag it as such, if bill cant be paid)
     public bool IsFailed { get; set; }
+
+    public bool Processed { get; set; }
 
     [Required]
     public char Period { get; set; }

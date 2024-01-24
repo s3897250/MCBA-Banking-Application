@@ -22,44 +22,68 @@ public class CustomerBackgroundServices : BackgroundService
 		while (!cancellationToken.IsCancellationRequested)
 		{
 			await CheckScheduledPayments(cancellationToken);
-			await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken); // Check every minute
-		}
-	}
+            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+        }
+    }
 
-	private async Task CheckScheduledPayments(CancellationToken cancellationToken)
-	{
-		using var scope = _services.CreateScope();
-		var dbContext = scope.ServiceProvider.GetRequiredService<MCBAContext>();
+    private async Task CheckScheduledPayments(CancellationToken cancellationToken)
+    {
+        using var scope = _services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<MCBAContext>();
 
-		var paymentsDue = dbContext.BillPays
-			.Include(bp => bp.Account)
-			.Where(bp => !bp.IsFailed && (bp.ScheduleTimeUtc <= DateTime.UtcNow))
-			.ToList();
+        try
+        {
+            var allPayments = await dbContext.BillPays
+                .Include(bp => bp.Account)
+                .Where(bp => !bp.IsFailed && !bp.Processed)
+                .ToListAsync(cancellationToken);
 
-		foreach (var payment in paymentsDue)
-		{
-			// Check account balance and process payment
-			if (payment.Account.Balance >= payment.Amount)
-			{
-				payment.Account.Balance -= payment.Amount;
-				// Further processing like transaction logging
-			}
-			else
-			{
-				payment.IsFailed = true;
-			}
+            Console.WriteLine($"Found {allPayments.Count} payments to check.");
 
-			// Handle periodic payments
-			if (payment.Period == 'M')
-			{
-				payment.ScheduleTimeUtc = payment.ScheduleTimeUtc.AddMonths(1);
-			}
-			else if (payment.Period == 'O')
-			{
-				// Handle one-off payment logic, if needed
-			}
+            foreach (var payment in allPayments)
+            {
+                if (payment.ScheduleTimeUtc > DateTime.Now)
+                {
+                    continue; // Skip to the next payment if not due
+                }
 
-			await dbContext.SaveChangesAsync(cancellationToken);
-		}
-	}
+                Console.WriteLine($"Processing payment {payment.BillPayID} for account {payment.AccountNumber}.");
+
+                // Check account balance and process payment
+                if (payment.Account.Balance >= payment.Amount)
+                {
+                    payment.Account.Balance -= payment.Amount;
+                }
+                else
+                {
+                    payment.IsFailed = true;
+                }
+
+                // Handle periodic payments
+                if (payment.Period == 'M')
+                {
+                    payment.ScheduleTimeUtc = payment.ScheduleTimeUtc.AddMonths(1);
+
+                    // Billpay yet to be processed again
+                    payment.Processed = false;
+                }
+                else if (payment.Period == 'O')
+                {
+                    // BillPay finished Processeing
+                    payment.Processed = true;
+
+                }
+
+                dbContext.BillPays.Update(payment);
+
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in CheckScheduledPayments: {ex.Message}");
+        }
+    }
+
+
 }

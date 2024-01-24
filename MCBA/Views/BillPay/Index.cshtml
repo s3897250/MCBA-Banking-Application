@@ -18,7 +18,7 @@
                 <th>Amount</th>
                 <th>Schedule Time (UTC)</th>
                 <th>Period</th>
-                <th>Actions</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -31,8 +31,22 @@
                 <td>@billPay.ScheduleTimeUtc.ToString("dd/MM/yyyy HH:mm")</td>
                 <td>@(billPay.Period == 'M' ? "Monthly" : "One-Off")</td>
                 <td>
-                    @*<a asp-action="Edit" asp-route-id="@billPay.BillPayID">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@billPay.BillPayID">Delete</a>*@
+                    @if (billPay.IsFailed)
+    {
+                    @:Failed
+                    <a asp-action="Create" asp-route-id="@billPay.BillPayID">Retry</a>
+    }
+    else if (billPay.ScheduleTimeUtc > DateTime.Now)
+    {
+                    @:Pending
+    }
+    else
+    {
+                    @:Succeeded
+    }
+                </td>
+
+                <td>
                 </td>
             </tr>
             }

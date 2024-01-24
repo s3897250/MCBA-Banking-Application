@@ -4,6 +4,7 @@ using MCBA.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MCBA.Migrations
 {
     [DbContext(typeof(MCBAContext))]
-    partial class MCBAContextModelSnapshot : ModelSnapshot
+    [Migration("20240124022217_BillPay")]
+    partial class BillPay
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,6 +61,9 @@ namespace MCBA.Migrations
                     b.Property<int>("AccountNumber")
                         .HasColumnType("int");
 
+                    b.Property<int>("AccountNumber1")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Amount")
                         .HasColumnType("money");
 
@@ -71,15 +77,12 @@ namespace MCBA.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(1)");
 
-                    b.Property<bool>("Processed")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("ScheduleTimeUtc")
                         .HasColumnType("datetime2");
 
                     b.HasKey("BillPayID");
 
-                    b.HasIndex("AccountNumber");
+                    b.HasIndex("AccountNumber1");
 
                     b.HasIndex("PayeeID");
 
@@ -238,7 +241,7 @@ namespace MCBA.Migrations
                 {
                     b.HasOne("MCBA.Models.Account", "Account")
                         .WithMany("BillPays")
-                        .HasForeignKey("AccountNumber")
+                        .HasForeignKey("AccountNumber1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
