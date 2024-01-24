@@ -1,5 +1,6 @@
 using MCBA.Data;
 using MCBA.Models;
+using MCBA.CustomerBackgroundServices;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,9 @@ builder.Services.AddControllersWithViews();
 // Add DbContext
 builder.Services.AddDbContext<MCBAContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MCBAContext")));
+
+// Background services for scheduled payments
+builder.Services.AddHostedService<CustomerBackgroundServices>();
 
 // Store session into Web-Server memory.
 builder.Services.AddDistributedMemoryCache();

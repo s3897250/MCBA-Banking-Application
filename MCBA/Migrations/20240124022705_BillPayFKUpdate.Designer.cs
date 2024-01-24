@@ -4,6 +4,7 @@ using MCBA.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MCBA.Migrations
 {
     [DbContext(typeof(MCBAContext))]
-    partial class MCBAContextModelSnapshot : ModelSnapshot
+    [Migration("20240124022705_BillPayFKUpdate")]
+    partial class BillPayFKUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,9 +73,6 @@ namespace MCBA.Migrations
                     b.Property<string>("Period")
                         .IsRequired()
                         .HasColumnType("nvarchar(1)");
-
-                    b.Property<bool>("Processed")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("ScheduleTimeUtc")
                         .HasColumnType("datetime2");

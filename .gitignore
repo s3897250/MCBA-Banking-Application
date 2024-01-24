@@ -20,3 +20,4 @@ artifacts/
 
 MCBA/wwwroot/lib/bootstrap/dist/css/*.css
 MCBA/wwwroot/lib/bootstrap/dist/js/*.js
+/MCBA/BackgroundServices/CustomerBackgroundService.cs
