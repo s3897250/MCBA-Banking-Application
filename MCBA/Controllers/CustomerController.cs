@@ -77,7 +77,10 @@ public class CustomerController : Controller
             Name = customer.Name,
             Address = customer.Address,
             City = customer.City,
-            PostCode = customer.PostCode
+            State = customer.State,
+            PostCode = customer.PostCode,
+            TFN = customer.TFN,
+            Mobile = customer.Mobile
         };
 
         return View(model);
@@ -99,7 +102,10 @@ public class CustomerController : Controller
             customer.Name = model.Name;
             customer.Address = model.Address;
             customer.City = model.City;
+            customer.State = model.State;
             customer.PostCode = model.PostCode;
+            customer.TFN = model.TFN;
+            customer.Mobile = model.Mobile;
 
             await _context.SaveChangesAsync();
             return RedirectToAction("MyProfile");

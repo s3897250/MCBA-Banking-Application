@@ -41,7 +41,11 @@ public class CustomerController : ControllerBase
             Name = customerDto.Name,
             Address = customerDto.Address,
             City = customerDto.City,
-            PostCode = customerDto.PostCode
+            State = customerDto.State,
+            PostCode = customerDto.PostCode,
+            TFN = customerDto.TFN,
+            Mobile = customerDto.Mobile
+
         };
 
         await _customerRepository.UpdateCustomer(customerToUpdate);

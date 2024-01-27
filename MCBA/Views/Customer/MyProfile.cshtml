@@ -16,8 +16,17 @@
         <dt class="col-sm-3">City:</dt>
         <dd class="col-sm-9">@Model.City</dd>
 
+        <dt class="col-sm-3">State:</dt>
+        <dd class="col-sm-9">@Model.State</dd>
+
         <dt class="col-sm-3">PostCode:</dt>
         <dd class="col-sm-9">@Model.PostCode</dd>
+
+        <dt class="col-sm-3">TFN:</dt>
+        <dd class="col-sm-9">@Model.TFN</dd>
+
+        <dt class="col-sm-3">Mobile:</dt>
+        <dd class="col-sm-9">@Model.Mobile</dd>
     </dl>
     <a href="@Url.Action("EditProfile", "Customer")" class="btn btn-primary">Edit Profile</a>
     <a href="@Url.Action("ChangePassword", "Customer")" class="btn btn-secondary">Change Password</a>

@@ -42,9 +42,11 @@ public class CustomerManager : ICustomerRepository
             existingCustomer.Name = customer.Name;
             existingCustomer.Address = customer.Address;
             existingCustomer.City = customer.City;
+            existingCustomer.State = customer.State;
             existingCustomer.PostCode = customer.PostCode;
+            existingCustomer.TFN = customer.TFN;
+            existingCustomer.Mobile = customer.Mobile;
 
-            // EF Core tracks changes and updates only the modified fields
             await _context.SaveChangesAsync();
         }
     }
