@@ -1,0 +1,27 @@
+﻿@model CustomerDTO
+@{
+    ViewData["Title"] = "Edit Customer Details";
+}
+
+<h2>Edit Customer, @Model.Name</h2>
+
+<form asp-controller="Admin" asp-action="Edit" method="post">
+    <input type="hidden" asp-for="CustomerID" />
+    <div>
+        <label asp-for="Name">Name</label>
+        <input asp-for="Name" />
+    </div>
+        <label asp-for="Address">Address</label>
+        <input asp-for="Address" />
+    <div>
+    </div>
+        <label asp-for="City">City</label>
+        <input asp-for="City" />
+    <div>
+    </div>
+        <label asp-for="PostCode">Post Code</label>
+        <input asp-for="PostCode" />
+    <div>
+        <input type="submit" value="Save" />
+    </div>
+</form>

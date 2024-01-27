@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MCBA.Models;
+namespace MCBAAdminPortal.Models;
 
 public class Login
 {
@@ -16,7 +16,6 @@ public class Login
     public string PasswordHash { get; set; }
 
     public bool IsLocked { get; set; } = false;
-
 
 
 }
