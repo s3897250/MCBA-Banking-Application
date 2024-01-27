@@ -21,6 +21,15 @@ public class Customer
     [StringLength(4)]
     public string? PostCode { get; set; }
 
+    [StringLength(11)]
+    public string? TFN { get; set; }
+
+    [StringLength(12)]
+    public string? Mobile { get; set; }
+
+    [StringLength(3)]
+    public string? State { get; set; }
+
     // Navigation properties
     public virtual List<Account> Accounts { get; set; }
 

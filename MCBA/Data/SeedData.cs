@@ -23,56 +23,59 @@ namespace MCBA.Data
             var json = client.GetStringAsync(Url).Result;
 
             var jsonString = @"
-{
-    ""Customers"": [
-        {
-            ""CustomerID"": 2100,
-            ""Name"": ""Matthew Bolger"",
-            ""Address"": ""123 Fake Street"",
-            ""City"": ""Melbourne"",
-            ""PostCode"": ""3000"",
-            ""Accounts"": [
-                {
-                    ""AccountNumber"": 4100,
-                    ""AccountType"": ""S"",
-                    ""CustomerID"": 2100,
-                    ""Transactions"": [
-                        {
-                            ""Amount"": 100.00,
-                            ""Comment"": ""Opening balance"",
-                            ""TransactionTimeUtc"": ""02/01/2024 08:00:00 PM""
+            {
+                ""Customers"": [
+                    {
+                        ""CustomerID"": 2100,
+                        ""Name"": ""Matthew Bolger"",
+                        ""TFN"": ""123 456 789"",
+                        ""Mobile"": ""0412 345 678"",
+                        ""State"": ""VIC"",
+                        ""Address"": ""123 Fake Street"",
+                        ""City"": ""Melbourne"",
+                        ""PostCode"": ""3000"",
+                        ""Accounts"": [
+                            {
+                                ""AccountNumber"": 4100,
+                                ""AccountType"": ""S"",
+                                ""CustomerID"": 2100,
+                                ""Transactions"": [
+                                    {
+                                        ""Amount"": 100.00,
+                                        ""Comment"": ""Opening balance"",
+                                        ""TransactionTimeUtc"": ""02/01/2024 08:00:00 PM""
+                                    }
+                                ],
+                                ""BillPays"": [
+                                    {
+                                        ""AccountNumber"": 4100,
+                                        ""PayeeID"": 1,
+                                        ""Amount"": 50.00,
+                                        ""ScheduleTimeUtc"": ""2024-03-01T10:00:00Z"",
+                                        ""Period"": ""M""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""Login"": {
+                            ""LoginID"": ""12345678"",
+                            ""PasswordHash"": ""Rfc2898DeriveBytes$50000$MrW2CQoJvjPMlynGLkGFrg==$x8iV0TiDbEXndl0Fg8V3Rw91j5f5nztWK1zu7eQa0EE=""
                         }
-                    ],
-                    ""BillPays"": [
-                        {
-                            ""AccountNumber"": 4100,
-                            ""PayeeID"": 1,
-                            ""Amount"": 50.00,
-                            ""ScheduleTimeUtc"": ""2024-03-01T10:00:00Z"",
-                            ""Period"": ""M""
-                        }
-                    ]
-                }
-            ],
-            ""Login"": {
-                ""LoginID"": ""12345678"",
-                ""PasswordHash"": ""Rfc2898DeriveBytes$50000$MrW2CQoJvjPMlynGLkGFrg==$x8iV0TiDbEXndl0Fg8V3Rw91j5f5nztWK1zu7eQa0EE=""
-            }
-        }
-        // ... other customer entries ...
-    ],
-    ""Payees"": [
-        {
-            ""Name"": ""Utility Company"",
-            ""Address"": ""789 Utility Rd"",
-            ""City"": ""Melbourne"",
-            ""State"": ""VIC"",
-            ""Postcode"": ""3006"",
-            ""Phone"": ""0399991234""
-        }
-        // ... other payee entries ...
-    ]
-}";
+                    }
+                    // ... other customer entries ...
+                ],
+                ""Payees"": [
+                    {
+                        ""Name"": ""Utility Company"",
+                        ""Address"": ""789 Utility Rd"",
+                        ""City"": ""Melbourne"",
+                        ""State"": ""VIC"",
+                        ""Postcode"": ""3006"",
+                        ""Phone"": ""0399991234""
+                    }
+                    // ... other payee entries ...
+                ]
+            }";
 
 
             var data = JsonConvert.DeserializeObject<SeedDataModel>(jsonString, new JsonSerializerSettings  // json or jsonString
