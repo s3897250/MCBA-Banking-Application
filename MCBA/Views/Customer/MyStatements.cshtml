@@ -1,0 +1,20 @@
+﻿@model List<Account>
+
+@{
+    ViewData["Title"] = "My Statements";
+}
+
+<h1>My Statements</h1>
+
+<p>Select an account:</p>
+<div style="display: flex; gap: 10px;">
+    @foreach (var account in Model)
+    {
+        <form method="get" asp-action="ViewMyStatementsList" style="margin-bottom: 0;">
+            <input type="hidden" name="number" value="@account.AccountNumber" />
+            <button type="submit" class="btn btn-primary">
+                @account.AccountType, @account.AccountNumber - Balance: @account.Balance
+            </button>
+        </form>
+    }
+</div>

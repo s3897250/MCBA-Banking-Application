@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using MCBA.Models;
 using MCBA.Data;
 using MCBA.ViewModels;
+using X.PagedList;
 
 namespace MCBA.Controllers;
 
@@ -393,6 +394,29 @@ public class CustomerController : Controller
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(Transfer));
+    }
+
+    public async Task<IActionResult> MyStatements()
+    {
+        var customer = await GetCustomer();
+        return View(customer.Accounts);
+    }
+    public async Task<IActionResult> ViewMyStatementsList(int number, int page = 1)
+    {
+        var account = await _context.Accounts
+            .Include(a => a.Transactions) // Eager load the Transactions
+            .FirstOrDefaultAsync(a => a.AccountNumber == number);
+
+        if ( account == null) 
+        {
+            return Redirect("/");
+        }
+        const int pageSize = 4;
+        var pagedList = await _context.Transactions.Where(x =>  x.AccountNumber == number)
+            .OrderByDescending(x => x.TransactionTimeUtc).ToPagedListAsync(page, pageSize);
+
+        ViewBag.Account = account;
+        return View(pagedList);
     }
 
 }

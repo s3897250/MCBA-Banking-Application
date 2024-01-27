@@ -1,0 +1,35 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model IPagedList<Transaction>
+@using MCBA.Models
+
+@{
+    ViewData["Title"] = "View Statement";
+    var account = ViewBag.Account as Account;
+}
+
+<h1>Statement for Account @account.AccountNumber</h1>
+
+<table class="table">
+    <tr>
+        <th>Transaction ID</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Transaction Time</th>
+        <th>Comment</th>
+    </tr>
+    @foreach (var transaction in Model)
+    {
+        <tr>
+            <td>@transaction.TransactionID</td>
+            <td>@transaction.TransactionType</td>
+            <td>@transaction.Amount</td>
+            <td>@transaction.TransactionTimeUtc.ToString("dd/MM/yyyy hh:mm tt")</td>
+            <td>@transaction.Comment</td>
+        </tr>
+    }
+</table>
+
+@Html.PagedListPager(Model, page => Url.Action("ViewMyStatementsList", new { number = account.AccountNumber, page }),
+        PagedListRenderOptions.ClassicPlusFirstAndLast)
