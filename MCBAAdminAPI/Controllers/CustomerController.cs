@@ -30,12 +30,21 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public IActionResult UpdateCustomer(int id, Customer customer)
+    public async Task<IActionResult> UpdateCustomer(int id, [FromBody] CustomerDTO customerDto)
     {
-        if (id != customer.CustomerID)
-            return BadRequest();
+        if (id != customerDto.CustomerID)
+            return BadRequest("Mismatched customer ID");
 
-        _customerRepository.UpdateCustomer(customer);
+        var customerToUpdate = new Customer
+        {
+            CustomerID = customerDto.CustomerID,
+            Name = customerDto.Name,
+            Address = customerDto.Address,
+            City = customerDto.City,
+            PostCode = customerDto.PostCode
+        };
+
+        await _customerRepository.UpdateCustomer(customerToUpdate);
         return NoContent();
     }
 }

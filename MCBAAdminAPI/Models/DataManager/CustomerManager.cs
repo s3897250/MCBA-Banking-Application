@@ -33,7 +33,19 @@ public class CustomerManager : ICustomerRepository
 
     public async Task UpdateCustomer(Customer customer)
     {
-        _context.Customers.Update(customer);
-        await _context.SaveChangesAsync();
+        var existingCustomer = await _context.Customers
+            .FirstOrDefaultAsync(c => c.CustomerID == customer.CustomerID);
+
+        if (existingCustomer != null)
+        {
+            // Update only specific fields of Customer
+            existingCustomer.Name = customer.Name;
+            existingCustomer.Address = customer.Address;
+            existingCustomer.City = customer.City;
+            existingCustomer.PostCode = customer.PostCode;
+
+            // EF Core tracks changes and updates only the modified fields
+            await _context.SaveChangesAsync();
+        }
     }
 }

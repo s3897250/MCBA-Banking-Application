@@ -1,0 +1,41 @@
+﻿@model List<MCBAAdminPortal.Models.Customer>
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2>Admin Dashboard</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>ID</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Model)
+        {
+            <tr>
+                <td>@customer.Name</td>
+                <td>@customer.CustomerID</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@customer.CustomerID">Edit</a> |
+                    @if (customer.Login.IsLocked)
+                    {
+                        <form asp-action="UnlockAccount" asp-route-loginId="@customer.Login.LoginID" method="post">
+                            <button type="submit">Unlock</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="LockAccount" asp-route-loginId="@customer.Login.LoginID" method="post">
+                            <button type="submit">Lock</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
