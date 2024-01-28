@@ -405,6 +405,10 @@ public class CustomerController : Controller
     public async Task<IActionResult> MyStatements()
     {
         var customer = await GetCustomer();
+        if (customer == null)
+        {
+            return Redirect("/");
+        }
         return View(customer.Accounts);
     }
     public async Task<IActionResult> ViewMyStatementsList(int number, int page = 1)

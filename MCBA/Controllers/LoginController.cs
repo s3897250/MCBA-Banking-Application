@@ -49,7 +49,7 @@ public class LoginController : Controller
         // Logout customer.
         HttpContext.Session.Clear();
 
-        return RedirectToAction("Index", "Home");
+        return Redirect("/");
     }
 
 

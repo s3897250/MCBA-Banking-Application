@@ -19,5 +19,11 @@ namespace MCBAAdminPortal.Controllers
             ModelState.AddModelError("", "The username or the password is wrong.");
             return View();
         }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return Redirect("/");
+        }
     }
 }
