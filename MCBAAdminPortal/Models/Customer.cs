@@ -18,9 +18,11 @@ public class Customer
     public string? City { get; set; }
 
     [StringLength(4)]
+    [RegularExpression(@"^\d{4}$", ErrorMessage = "Must be 4 digits")]
     public string? PostCode { get; set; }
 
     [StringLength(11)]
+    [RegularExpression(@"^\d{3}\s\d{3}\s\d{3}$", ErrorMessage = "TFN must be of the format: XXX XXX XXX")]
     public string? TFN { get; set; }
 
     [StringLength(12)]
@@ -28,6 +30,7 @@ public class Customer
     public string? Mobile { get; set; }
 
     [StringLength(3)]
+    [RegularExpression(@"^[A-Za-z]{2,3}$", ErrorMessage = "Must be a 2 or 3 lettered Australian state")]
     public string? State { get; set; }
 
     public virtual Login Login { get; set; }

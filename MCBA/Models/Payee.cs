@@ -17,12 +17,15 @@ public class Payee
     [Required, StringLength(40)]
     public string City { get; set; }
 
-    [Required, StringLength(3, MinimumLength = 2)]
+    [StringLength(3)]
+    [RegularExpression(@"^[A-Za-z]{2,3}$", ErrorMessage = "Must be a 2 or 3 lettered Australian state")]
     public string State { get; set; }
 
     [Required, StringLength(4)]
+    [RegularExpression(@"^\d{4}$", ErrorMessage = "Must be 4 digits")]
     public string Postcode { get; set; }
 
     [Required, StringLength(14)]
+    [RegularExpression(@"^\(0\d\)\s\d{4}\s\d{4}$", ErrorMessage = "Phone must be of the format: (0X) XXXX XXXX")]
     public string Phone { get; set; }
 }
