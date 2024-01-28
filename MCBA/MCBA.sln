@@ -5,9 +5,11 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCBA", "MCBA.csproj", "{0FA2E3E5-7EBD-47FD-AF35-E79041CC2D9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCBAAdminAPI", "..\MCBAAdminAPI\MCBAAdminAPI.csproj", "{BABEFFF2-D843-425E-8157-9AB879FEBC83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCBAAdminAPI", "..\MCBAAdminAPI\MCBAAdminAPI.csproj", "{BABEFFF2-D843-425E-8157-9AB879FEBC83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCBAAdminPortal", "..\MCBAAdminPortal\MCBAAdminPortal.csproj", "{E0892BFD-5BFE-45D7-B1E4-32112D3DEA7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCBAAdminPortal", "..\MCBAAdminPortal\MCBAAdminPortal.csproj", "{E0892BFD-5BFE-45D7-B1E4-32112D3DEA7D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCBA.Tests", "..\MCBA.Tests\MCBA.Tests.csproj", "{F6177794-1975-4C92-ACEB-830B78B8A009}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{E0892BFD-5BFE-45D7-B1E4-32112D3DEA7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0892BFD-5BFE-45D7-B1E4-32112D3DEA7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0892BFD-5BFE-45D7-B1E4-32112D3DEA7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6177794-1975-4C92-ACEB-830B78B8A009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6177794-1975-4C92-ACEB-830B78B8A009}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6177794-1975-4C92-ACEB-830B78B8A009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6177794-1975-4C92-ACEB-830B78B8A009}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
