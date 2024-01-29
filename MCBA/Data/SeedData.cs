@@ -5,6 +5,7 @@ using System.Net.Http;
 using MCBA.Data;
 using MCBA.Models;
 using Newtonsoft.Json;
+using SimpleHashing.Net;
 
 namespace MCBA.Data
 {
@@ -139,6 +140,44 @@ namespace MCBA.Data
             }
 
             context.SaveChanges();
+        }
+        public static void SeedTestData(MCBAContext context)
+        {
+            if (context.Customers.Any())
+                return;
+
+            var customer = new Customer
+            {
+                CustomerID = 2100,
+                Name = "Test Customer",
+                Address = "111 Test Street",
+                City = "Testville",
+                PostCode = "1234",
+                State = "TS",
+                TFN = "123 456 789",
+                Mobile = "0412 345 678",
+                Login = new Login
+                {
+                    LoginID = "12345678",
+                    PasswordHash = new SimpleHash().Compute("abc111"),
+                    CustomerID = 2100
+                },
+                Accounts = new List<Account>
+            {
+                new Account
+                {
+                    AccountNumber = 4100,
+                    AccountType = "S",
+                    Balance = 1000,
+                    CustomerID = 2100
+                }
+            }
+            };
+
+            context.Customers.Add(customer);
+
+            context.SaveChanges();
+
         }
     }
 
