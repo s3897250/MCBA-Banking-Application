@@ -1,55 +1,330 @@
 using MCBA.Controllers;
+using MCBA.Data;
 using MCBA.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
-
+using SimpleHashing.Net;
+using System.ComponentModel.DataAnnotations;
+using MCBA.ViewModels;
 namespace MCBA.Tests;
 
 public class CustomerControllerTests : IDisposable
 {
     private readonly MCBAContext _context;
+    private readonly CustomerController _controller;
+    private readonly HttpContext _httpContext;
+    private readonly ISession _session;
 
     public CustomerControllerTests()
     {
-        // Using an in-memory SQLite database.
-        // NOTE: The shared cache allows multiple connections to access the database.
-        // NOTE: To support multiple tests running in parallel on separate in-memory databases the following
-        // connection string can be used: $"Data Source=file:{Guid.NewGuid()}?mode=memory&cache=shared"
-        _context = new MCBAContext(new DbContextOptionsBuilder<MCBAContext>().
-            UseSqlite("Data Source=file::memory:?cache=shared").Options);
+        var options = new DbContextOptionsBuilder<MCBAContext>()
+                    .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                    .Options;
+        _context = new MCBAContext(options);
+        SeedData.SeedTestData(_context);
 
-        // The EnsureCreated method creates the schema based on the current context model.
-        _context.Database.EnsureCreated();
+        _session = new SimpleSession();
+        _httpContext = new DefaultHttpContext { Session = _session };
 
-        SeedData.Initialize(_context);
+        // Set session ID - This is to assume that the customer with ID 2100 has already been logged in.
+        _session.SetInt32(nameof(Customer.CustomerID), 2100); // Example Customer ID
 
-        // You can read more about testing with databases here:
-        // 
-        // https://learn.microsoft.com/en-au/ef/core/testing/
-        // https://learn.microsoft.com/en-au/ef/core/testing/choosing-a-testing-strategy#sqlite-as-a-database-fake
-
-        // NOTE: The technique below is using the EF Core In-Memory provider - this provider was originally designed
-        // to support internal testing of EF Core itself. Whilst it can be used it is now highly discouraged.
-        // 
-        // You can read more about this approach here:
-        // https://learn.microsoft.com/en-au/ef/core/testing/choosing-a-testing-strategy#in-memory-as-a-database-fake
-        // 
-        // This approach uses the Microsoft.EntityFrameworkCore.InMemory package.
-
-        // Seed data into the database using an in-memory instance of the context.
-        //_context = new MCBAContext(new DbContextOptionsBuilder<MCBAContext>().
-        //    UseInMemoryDatabase(nameof(MCBAContext)).Options);
-        //SeedData.Initialize(_context);
+        _controller = new CustomerController(_context)
+        {
+            ControllerContext = new ControllerContext { HttpContext = _httpContext }
+        };
     }
 
     public void Dispose()
     {
         _context.Database.EnsureDeleted();
         _context.Dispose();
-        GC.SuppressFinalize(this);
+    }
+
+    [Fact]
+    public async Task Index_ReturnsCustomerView_WithCustomerData()
+    {
+        // Arrange - No arrangement required as data is seeded
+
+        // Act
+        var result = await _controller.Index();
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<Customer>(viewResult.Model);
+        Assert.NotNull(model);
+        Assert.Equal(2100, model.CustomerID);
     }
 
 
+    [Fact]
+    public async Task MyProfile_ReturnsCustomerView_WithCustomerData()
+    {
+        // Arrange
+
+        // Act
+        var result = await _controller.MyProfile();
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<Customer>(viewResult.Model);
+        Assert.NotNull(model);
+        Assert.Equal(2100, model.CustomerID);
+    }
+
+
+    [Theory]
+    [InlineData("abc111", "newPass123", "newPass123")] // Valid change
+    [InlineData("wrongOldPass", "newPass123", "newPass123")] // Incorrect old password
+    [InlineData("abc111", "newPass123", "differentNewPass")] // New passwords don't match
+    public async Task ChangePassword_Post_VariousScenarios(string oldPassword, string newPassword, string confirmPassword)
+    {
+        // Arrange
+        var model = new ChangePasswordViewModel
+        {
+            OldPassword = oldPassword,
+            NewPassword = newPassword,
+            ConfirmPassword = confirmPassword
+        };
+        ISimpleHash s_simpleHash = new SimpleHash();
+
+        // Act
+        var result = await _controller.ChangePassword(model);
+
+        // Assert
+        if (oldPassword == "abc111" && newPassword == confirmPassword)
+        {
+            // Valid scenario
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("MyProfile", redirectToActionResult.ActionName);
+
+            var updatedCustomer = await _context.Customers.Include(c => c.Login).FirstOrDefaultAsync(c => c.CustomerID == 2100);
+            Assert.True(s_simpleHash.Verify(newPassword, updatedCustomer.Login.PasswordHash));
+        }
+        else
+        {
+            // Invalid scenario
+            Assert.IsType<ViewResult>(result);
+            Assert.False(_controller.ModelState.IsValid);
+        }
+    }
+
+    [Theory]
+    [InlineData("Shrey", "133 Droop Street", "Melbourne", "VIC", "3000", "123 456 789", "0412 345 678")]
+    [InlineData("Singhal", "", "", "VIC", "3000", "123 456 789", "0412 345 678")]
+    public async Task EditProfile_Post_Success(string name, string address, string city, string state, string postcode, string tfn, string mobile)
+    {
+        // Arrange
+        var controller = new CustomerController(_context);
+        var model = new EditProfileViewModel
+        {
+            Name = name,
+            Address = address,
+            City = city,
+            State = state,
+            PostCode = postcode,
+            TFN = tfn,
+            Mobile = mobile
+        };
+        var validationContext = new ValidationContext(model);
+        var validationResults = new List<ValidationResult>();
+        Validator.TryValidateObject(model, validationContext, validationResults, true);
+
+        foreach (var validationResult in validationResults)
+        {
+            foreach (var memberName in validationResult.MemberNames)
+            {
+                controller.ModelState.AddModelError(memberName, validationResult.ErrorMessage);
+            }
+        }
+
+        // Act
+        var result = await _controller.EditProfile(model);
+
+        // Assert
+        var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("MyProfile", redirectToActionResult.ActionName);
+
+        var updatedCustomer = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerID == 2100);
+        Assert.Equal(name, updatedCustomer.Name);
+
+    }
+
+
+
+    [Theory]
+    [InlineData("", "123 Street", "City", "VIC", "3000", "123 456 789", "0412 345 678")] // Invalid Name
+    [InlineData("Shrey", "133 Droop Street", "Melbourn", "F", "3000", "123 456 789", "0412 345 678")] // Invalid State
+    [InlineData("Shrey", "133 Droop Street", "Melbourn", "VIC", "3000", "123", "0412 345 678")] // Invalid TFN
+    public async Task EditProfile_Post_Failure(string name, string address, string city, string state, string postcode, string tfn, string mobile)
+    {
+        // Arrange
+        var controller = new CustomerController(_context);
+        var model = new EditProfileViewModel
+        {
+            Name = name,
+            Address = address,
+            City = city,
+            State = state,
+            PostCode = postcode,
+            TFN = tfn,
+            Mobile = mobile
+        };
+
+        var validationContext = new ValidationContext(model);
+        var validationResults = new List<ValidationResult>();
+        Validator.TryValidateObject(model, validationContext, validationResults, true);
+
+        foreach (var validationResult in validationResults)
+        {
+            foreach (var memberName in validationResult.MemberNames)
+            {
+                controller.ModelState.AddModelError(memberName, validationResult.ErrorMessage);
+            }
+        }
+
+        // Act
+        var result = await controller.EditProfile(model);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(controller.ModelState.IsValid);
+    }
+
+    [Fact]
+    public async Task Deposit_Get_ReturnsCorrectViewWithModel()
+    {
+        // Arrange
+        int testAccountId = 4100;
+        SeedData.SeedTestData(_context);
+
+        // Act
+        var result = await _controller.Deposit(testAccountId);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<DepositAndWithdrawViewModel>(viewResult.Model);
+        Assert.NotNull(model);
+        Assert.Equal(testAccountId, model.AccountNumber);
+    }
+
+
+    [Fact]
+    public async Task Deposit_Post_Successful()
+    {
+        // Arrange
+        var viewModel = new DepositAndWithdrawViewModel
+        {
+            AccountNumber = 4100,
+            Amount = 100,
+            Comment = "Test deposit"
+        };
+
+        // Act
+        var result = await _controller.Deposit(viewModel);
+
+        // Assert
+        var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("Index", redirectToActionResult.ActionName);
+    }
+
+    [Theory]
+    [InlineData(0)] // Zero amount
+    [InlineData(-100)] // Negative amount
+    public async Task Deposit_Post_Failure(decimal amount)
+    {
+        // Arrange
+        var viewModel = new DepositAndWithdrawViewModel
+        {
+            AccountNumber = 4100,
+            Amount = amount,
+            Comment = "Invalid deposit Test"
+        };
+
+        // Act
+        var result = await _controller.Deposit(viewModel);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(_controller.ModelState.IsValid);
+        Assert.True(_controller.ModelState.ContainsKey(nameof(viewModel.Amount)));
+    }
+
+    [Fact]
+    public async Task Withdraw_Get_ReturnsCorrectViewWithModel()
+    {
+        // Arrange
+        int testAccountId = 4100;
+
+        // Act
+        var result = await _controller.Withdraw(testAccountId);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<DepositAndWithdrawViewModel>(viewResult.Model);
+        Assert.NotNull(model);
+        Assert.Equal(testAccountId, model.AccountNumber);
+    }
+
+    [Theory]
+    [InlineData(0)] // Zero amount
+    [InlineData(-100)] // Negative amount
+    public async Task Withdraw_Post_FailureOnInvalidAmount(decimal amount)
+    {
+        // Arrange
+        var viewModel = new DepositAndWithdrawViewModel
+        {
+            AccountNumber = 4100,
+            Amount = amount,
+            Comment = "Invalid withdrawal Test"
+        };
+
+        // Act
+        var result = await _controller.Withdraw(viewModel);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(_controller.ModelState.IsValid);
+        Assert.True(_controller.ModelState.ContainsKey(nameof(viewModel.Amount)));
+    }
+
+    [Fact]
+    public async Task Withdraw_Post_FailureOnInsufficientFunds()
+    {
+        // Arrange
+        var viewModel = new DepositAndWithdrawViewModel
+        {
+            AccountNumber = 4100,
+            Amount = 10000,
+            Comment = "Withdrawal -- Insufficient Funds Test"
+        };
+
+        // Act
+        var result = await _controller.Withdraw(viewModel);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(_controller.ModelState.IsValid);
+        Assert.True(_controller.ModelState.ContainsKey(nameof(viewModel.Amount)));
+    }
+
+
+    [Fact]
+    public async Task MyStatements_ReturnsView_WithAccounts()
+    {
+        // Arrange - Seed the customer data and login the customer
+        SeedData.SeedTestData(_context);
+        _session.SetInt32(nameof(Customer.CustomerID), 2100);
+
+        // Act
+        var result = await _controller.MyStatements();
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<List<Account>>(viewResult.Model);
+        Assert.NotEmpty(model);
+    }
 
 }

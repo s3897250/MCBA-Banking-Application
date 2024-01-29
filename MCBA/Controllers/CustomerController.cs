@@ -28,7 +28,7 @@ public class CustomerController : Controller
         _context = context;
     }
 
-    private async Task<Customer> GetCustomer()
+    public async Task<Customer> GetCustomer()
     {
         var customerID = CustomerID;
 
@@ -428,5 +428,8 @@ public class CustomerController : Controller
         ViewBag.Account = account;
         return View(pagedList);
     }
+
+
+
 
 }

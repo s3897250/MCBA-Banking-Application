@@ -4,7 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using MCBA.Data;
 using MCBA.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using SimpleHashing.Net;
 
 namespace MCBA.Data
 {
@@ -139,6 +141,58 @@ namespace MCBA.Data
             }
 
             context.SaveChanges();
+        }
+        public static void SeedTestData(MCBAContext context)
+        {
+            if (context.Customers.Any(c => c.CustomerID == 2100))
+                return;
+
+            var customer = new Customer
+            {
+                CustomerID = 2100,
+                Name = "Test Customer",
+                Address = "111 Test Street",
+                City = "Testville",
+                PostCode = "1234",
+                State = "TS",
+                TFN = "123 456 789",
+                Mobile = "0412 345 678",
+                Login = new Login
+                {
+                    LoginID = "12345678",
+                    PasswordHash = new SimpleHash().Compute("abc111"),
+                    CustomerID = 2100
+                },
+                Accounts =
+                [
+                    new Account
+                    {
+                        AccountNumber = 4100,
+                        AccountType = "S",
+                        Balance = 1000,
+                        CustomerID = 2100,
+
+                        BillPays =
+                        [
+                            new BillPay
+                            {
+                                AccountNumber = 4100,
+                                PayeeID = 1,
+                                Amount = 60,
+                                ScheduleTimeUtc = DateTime.UtcNow.AddDays(30),
+                                Period = 'M',
+                            }
+                        ]
+                    }
+                ]
+            };
+            context.Payees.Add(new Payee { PayeeID = 1, Name = "Testing Company", Address = "789 Testing Rd", City = "Melbourne", State = "VIC", Postcode = "3006", Phone = "(03) 9999 1234" });
+
+
+            context.Customers.Add(customer);
+
+            context.SaveChanges();
+
         }
     }
 
