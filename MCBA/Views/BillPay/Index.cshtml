@@ -36,13 +36,13 @@
                                 @:Failed
                                 <a asp-action="Retry" asp-route-id="@billPay.BillPayID">Retry</a>
                             }
-                            else if (billPay.ScheduleTimeUtc > DateTime.UtcNow)
+                            else if (billPay.Processed)
                             {
-                                @:Pending
+                                @:Succeeded
                             }
                             else
                             {
-                                @:Succeeded
+                                @:Pending
                             }
                         </td>
                         <td>

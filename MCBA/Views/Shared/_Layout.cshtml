@@ -38,8 +38,20 @@
                             {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Customer" asp-action="Index">
-                                    @* Welcome, @Context.Session.GetString(nameof(Customer.Name)) *@ATM Operations
+                                    ATM Operations
                                 </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Customer" asp-action="Index">Deposit</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Customer" asp-action="Index">Withdraw</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Customer" asp-action="Index">Transfer</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Customer" asp-action="Index">Bill Pay</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Login" asp-action="Logout">Logout</a>
