@@ -64,7 +64,6 @@ namespace MCBA.Data
                             ""PasswordHash"": ""Rfc2898DeriveBytes$50000$MrW2CQoJvjPMlynGLkGFrg==$x8iV0TiDbEXndl0Fg8V3Rw91j5f5nztWK1zu7eQa0EE=""
                         }
                     }
-                    // ... other customer entries ...
                 ],
                 ""Payees"": [
                     {
@@ -74,8 +73,23 @@ namespace MCBA.Data
                         ""State"": ""VIC"",
                         ""Postcode"": ""3006"",
                         ""Phone"": ""0399991234""
+                    },
+                    {
+                        ""Name"": ""Internet Service Provider"",
+                        ""Address"": ""123 Web Street"",
+                        ""City"": ""Sydney"",
+                        ""State"": ""NSW"",
+                        ""Postcode"": ""2001"",
+                        ""Phone"": ""0298765432""
+                    },
+                    {
+                        ""Name"": ""Health Insurance"",
+                        ""Address"": ""456 Healthy Lane"",
+                        ""City"": ""Brisbane"",
+                        ""State"": ""QLD"",
+                        ""Postcode"": ""4000"",
+                        ""Phone"": ""0733334444""
                     }
-                    // ... other payee entries ...
                 ]
             }";
 
