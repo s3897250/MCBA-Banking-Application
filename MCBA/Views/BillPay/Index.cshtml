@@ -5,59 +5,61 @@
 }
 
 <div class="text-center">
-
     <h2>@ViewData["Title"]</h2>
 
     @if (Model.BillPays != null && Model.BillPays.Any())
     {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Bill ID</th>
-                <th>Payee</th>
-                <th>Amount</th>
-                <th>Schedule Time (UTC)</th>
-                <th>Period</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var billPay in Model.BillPays)
-            {
-            <tr>
-                <td>@billPay.BillPayID</td>
-                <td>@billPay.Payee.Name</td>
-                <td>@billPay.Amount.ToString("C")</td>
-                <td>@billPay.ScheduleTimeUtc.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@(billPay.Period == 'M' ? "Monthly" : "One-Off")</td>
-                <td>
-                    @if (billPay.IsFailed)
-    {
-                    @:Failed
-                    <a asp-action="Create" asp-route-id="@billPay.BillPayID">Retry</a>
-    }
-    else if (billPay.ScheduleTimeUtc > DateTime.Now)
-    {
-                    @:Pending
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Bill ID</th>
+                    <th>Payee</th>
+                    <th>Amount</th>
+                    <th>Schedule Time (UTC)</th>
+                    <th>Period</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var billPay in Model.BillPays)
+                {
+                    <tr>
+                        <td>@billPay.BillPayID</td>
+                        <td>@billPay.Payee.Name</td>
+                        <td>@billPay.Amount.ToString("C")</td>
+                        <td>@billPay.ScheduleTimeUtc.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@(billPay.Period == 'M' ? "Monthly" : "One-Off")</td>
+                        <td>
+                            @if (billPay.IsFailed)
+                            {
+                                @:Failed
+                                <a asp-action="Retry" asp-route-id="@billPay.BillPayID">Retry</a>
+                            }
+                            else if (billPay.ScheduleTimeUtc > DateTime.UtcNow)
+                            {
+                                @:Pending
+                            }
+                            else
+                            {
+                                @:Succeeded
+                            }
+                        </td>
+                        <td>
+                            @if (!billPay.Processed && billPay.ScheduleTimeUtc > DateTime.UtcNow)
+                            {
+                                <a asp-action="Cancel" asp-route-billPayId="@billPay.BillPayID">Cancel</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     }
     else
     {
-                    @:Succeeded
-    }
-                </td>
-
-                <td>
-                </td>
-            </tr>
-            }
-        </tbody>
-    </table>
-    }
-    else
-    {
-    <p>No scheduled payments found for this account.</p>
+        <p>No scheduled payments found for this account.</p>
     }
 
     <a asp-action="Create" asp-route-accountId="@Model.AccountNumber">Schedule New Payment</a>
-
 </div>

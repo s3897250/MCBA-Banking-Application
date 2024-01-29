@@ -163,17 +163,31 @@ namespace MCBA.Data
                     PasswordHash = new SimpleHash().Compute("abc111"),
                     CustomerID = 2100
                 },
-                Accounts = new List<Account>
-            {
-                new Account
-                {
-                    AccountNumber = 4100,
-                    AccountType = "S",
-                    Balance = 1000,
-                    CustomerID = 2100
-                }
-            }
+                Accounts =
+                [
+                    new Account
+                    {
+                        AccountNumber = 4100,
+                        AccountType = "S",
+                        Balance = 1000,
+                        CustomerID = 2100,
+
+                        BillPays =
+                        [
+                            new BillPay
+                            {
+                                AccountNumber = 4100,
+                                PayeeID = 1,
+                                Amount = 60,
+                                ScheduleTimeUtc = DateTime.UtcNow.AddDays(30),
+                                Period = 'M',
+                            }
+                        ]
+                    }
+                ]
             };
+            context.Payees.Add(new Payee { PayeeID = 1, Name = "Testing Company", Address = "789 Testing Rd", City = "Melbourne", State = "VIC", Postcode = "3006", Phone = "(03) 9999 1234" });
+
 
             context.Customers.Add(customer);
 

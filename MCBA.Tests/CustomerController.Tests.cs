@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Xunit;
 using SimpleHashing.Net;
 using System.ComponentModel.DataAnnotations;
+using MCBA.ViewModels;
 namespace MCBA.Tests;
 
 public class CustomerControllerTests : IDisposable
@@ -190,6 +191,140 @@ public class CustomerControllerTests : IDisposable
         // Assert
         var viewResult = Assert.IsType<ViewResult>(result);
         Assert.False(controller.ModelState.IsValid);
+    }
+
+    [Fact]
+    public async Task Deposit_Get_ReturnsCorrectViewWithModel()
+    {
+        // Arrange
+        int testAccountId = 4100;
+        SeedData.SeedTestData(_context);
+
+        // Act
+        var result = await _controller.Deposit(testAccountId);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<DepositAndWithdrawViewModel>(viewResult.Model);
+        Assert.NotNull(model);
+        Assert.Equal(testAccountId, model.AccountNumber);
+    }
+
+
+    [Fact]
+    public async Task Deposit_Post_Successful()
+    {
+        // Arrange
+        var viewModel = new DepositAndWithdrawViewModel
+        {
+            AccountNumber = 4100,
+            Amount = 100,
+            Comment = "Test deposit"
+        };
+
+        // Act
+        var result = await _controller.Deposit(viewModel);
+
+        // Assert
+        var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("Index", redirectToActionResult.ActionName);
+    }
+
+    [Theory]
+    [InlineData(0)] // Zero amount
+    [InlineData(-100)] // Negative amount
+    public async Task Deposit_Post_Failure(decimal amount)
+    {
+        // Arrange
+        var viewModel = new DepositAndWithdrawViewModel
+        {
+            AccountNumber = 4100,
+            Amount = amount,
+            Comment = "Invalid deposit Test"
+        };
+
+        // Act
+        var result = await _controller.Deposit(viewModel);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(_controller.ModelState.IsValid);
+        Assert.True(_controller.ModelState.ContainsKey(nameof(viewModel.Amount)));
+    }
+
+    [Fact]
+    public async Task Withdraw_Get_ReturnsCorrectViewWithModel()
+    {
+        // Arrange
+        int testAccountId = 4100;
+
+        // Act
+        var result = await _controller.Withdraw(testAccountId);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<DepositAndWithdrawViewModel>(viewResult.Model);
+        Assert.NotNull(model);
+        Assert.Equal(testAccountId, model.AccountNumber);
+    }
+
+    [Theory]
+    [InlineData(0)] // Zero amount
+    [InlineData(-100)] // Negative amount
+    public async Task Withdraw_Post_FailureOnInvalidAmount(decimal amount)
+    {
+        // Arrange
+        var viewModel = new DepositAndWithdrawViewModel
+        {
+            AccountNumber = 4100,
+            Amount = amount,
+            Comment = "Invalid withdrawal Test"
+        };
+
+        // Act
+        var result = await _controller.Withdraw(viewModel);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(_controller.ModelState.IsValid);
+        Assert.True(_controller.ModelState.ContainsKey(nameof(viewModel.Amount)));
+    }
+
+    [Fact]
+    public async Task Withdraw_Post_FailureOnInsufficientFunds()
+    {
+        // Arrange
+        var viewModel = new DepositAndWithdrawViewModel
+        {
+            AccountNumber = 4100,
+            Amount = 10000,
+            Comment = "Withdrawal -- Insufficient Funds Test"
+        };
+
+        // Act
+        var result = await _controller.Withdraw(viewModel);
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        Assert.False(_controller.ModelState.IsValid);
+        Assert.True(_controller.ModelState.ContainsKey(nameof(viewModel.Amount)));
+    }
+
+
+    [Fact]
+    public async Task MyStatements_ReturnsView_WithAccounts()
+    {
+        // Arrange - Seed the customer data and login the customer
+        SeedData.SeedTestData(_context);
+        _session.SetInt32(nameof(Customer.CustomerID), 2100);
+
+        // Act
+        var result = await _controller.MyStatements();
+
+        // Assert
+        var viewResult = Assert.IsType<ViewResult>(result);
+        var model = Assert.IsAssignableFrom<List<Account>>(viewResult.Model);
+        Assert.NotEmpty(model);
     }
 
 }

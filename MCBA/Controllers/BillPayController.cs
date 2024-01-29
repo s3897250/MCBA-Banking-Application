@@ -92,5 +92,26 @@ public class BillPayController : Controller
         return RedirectToAction("Index", new { id = viewModel.AccountNumber });
     }
 
+    public async Task<IActionResult> Cancel(int billPayId)
+    {
+        var billPay = await _context.BillPays.FindAsync(billPayId);
+
+        if (billPay == null)
+        {
+            return NotFound();
+        }
+
+        // Check if the bill payment is already processed or not
+        if (billPay.Processed)
+        {
+            return BadRequest("Cannot cancel a processed bill payment.");
+        }
+
+        _context.BillPays.Remove(billPay);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("Index", new { id = billPay.AccountNumber });
+    }
+
 
 }

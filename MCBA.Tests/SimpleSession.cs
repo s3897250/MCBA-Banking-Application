@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MCBA.Tests;
+
 public class SimpleSession : ISession
 {
     private readonly Dictionary<string, byte[]> _sessionStorage = new Dictionary<string, byte[]>();
@@ -23,4 +20,6 @@ public class SimpleSession : ISession
     public void Set(string key, byte[] value) => _sessionStorage[key] = value;
 
     public bool TryGetValue(string key, out byte[] value) => _sessionStorage.TryGetValue(key, out value);
+
+
 }
