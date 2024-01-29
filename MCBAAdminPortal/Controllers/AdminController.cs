@@ -41,13 +41,13 @@ namespace MCBAAdminPortal.Controllers
             var result = await response.Content.ReadAsStringAsync();
             var customerDto = JsonConvert.DeserializeObject<CustomerDTO>(result); // Deserialize to CustomerDTO
 
-            return View(customerDto); // Pass CustomerDTO to the view
+            return View(customerDto);
         }
 
         // POST
         [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, CustomerDTO customerDto) // Use CustomerDTO
+        public async Task<IActionResult> Edit(int id, CustomerDTO customerDto)
         {
             if (id != customerDto.CustomerID)
                 return NotFound();

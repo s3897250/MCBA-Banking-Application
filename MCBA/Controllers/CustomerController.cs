@@ -1,5 +1,5 @@
 
-﻿using Castle.Core.Resource;
+using Castle.Core.Resource;
 using Microsoft.AspNetCore.Authorization;
 using SimpleHashing.Net;
 using System.Diagnostics;

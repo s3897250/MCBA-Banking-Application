@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MCBA.Models
+namespace MCBA.ViewModels
 {
     public class EditProfileViewModel
     {
-        
+
         [Required, StringLength(50)]
         public string Name { get; set; }
 

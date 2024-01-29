@@ -11,6 +11,7 @@ namespace MCBAAdminAPI.Models.DataManager
         {
             _context = context;
         }
+        // Updates the lock status of a specific login.
         public async Task UpdateLoginStatus(string loginId, bool lockStatus)
         {
             var login = await _context.Logins.FirstOrDefaultAsync(l => l.LoginID == loginId);

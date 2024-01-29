@@ -14,12 +14,14 @@ public class CustomerManager : ICustomerRepository
         _context = context;
     }
 
+    // Retrieves all customers from the database.
     public async Task<IEnumerable<Customer>> GetAll()
     {
         return await _context.Customers.Include(c => c.Login).ToListAsync();
 
     }
 
+    // Retrieves a specific customer by their ID.
     public async Task<Customer> GetCustomerById(int id)
     {
         var customer = await _context.Customers.Include(c => c.Login).FirstOrDefaultAsync(i => i.CustomerID == id);
@@ -31,6 +33,7 @@ public class CustomerManager : ICustomerRepository
         return null;
     }
 
+    // Updates the details of a specific customer.
     public async Task UpdateCustomer(Customer customer)
     {
         var existingCustomer = await _context.Customers

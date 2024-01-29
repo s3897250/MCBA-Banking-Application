@@ -17,18 +17,24 @@ public class CustomerController : ControllerBase
         _customerRepository = customerRepository;
     }
 
+    // Retrieves all customers.
+    // GET: api/Customer
     [HttpGet]
     public async Task<IEnumerable<Customer>> GetAll()
     {
         return await _customerRepository.GetAll();
     }
 
+    // Retrieves all customers.
+    // GET: api/Customer/{id}
     [HttpGet("{id}")]
-    public async Task<Customer> GetCustomerByName(int id)
+    public async Task<Customer> GetCustomerByID(int id)
     {
         return await _customerRepository.GetCustomerById(id);
     }
 
+    // Updates specific customer's details
+    // GET: api/Customer/{id}
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateCustomer(int id, [FromBody] CustomerDTO customerDto)
     {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
-namespace MCBA.Models
+namespace MCBA.ViewModels
 {
     public class ChangePasswordViewModel
     {
