@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using MCBA.Data;
 using MCBA.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SimpleHashing.Net;
 
@@ -143,7 +144,7 @@ namespace MCBA.Data
         }
         public static void SeedTestData(MCBAContext context)
         {
-            if (context.Customers.Any())
+            if (context.Customers.Any(c => c.CustomerID == 2100))
                 return;
 
             var customer = new Customer

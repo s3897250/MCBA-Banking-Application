@@ -1,67 +1,39 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Moq;
+
 using MCBA.Controllers;
 using MCBA.Data;
-using MCBA.Models;
-using System.Threading.Tasks;
+
 using Xunit;
-using SimpleHashing.Net;
+
 
 namespace MCBA.Tests;
 public class LoginControllerTests : IDisposable
 {
     private readonly MCBAContext _context;
-    private readonly Mock<HttpContext> _mockHttpContext;
-    private readonly Mock<ISession> _mockSession;
     private readonly LoginController _controller;
+    private readonly HttpContext _httpContext;
+    private readonly ISession _session;
 
     public LoginControllerTests()
     {
         var options = new DbContextOptionsBuilder<MCBAContext>()
-            .UseInMemoryDatabase(databaseName: "TestLoginDb")
-            .Options;
+                    .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                    .Options;
         _context = new MCBAContext(options);
+        SeedData.SeedTestData(_context);
 
-        _mockHttpContext = new Mock<HttpContext>();
-        _mockSession = new Mock<ISession>();
-        _mockHttpContext.Setup(c => c.Session).Returns(_mockSession.Object);
+        _session = new SimpleSession();
+        _httpContext = new DefaultHttpContext { Session = _session };
+
 
         _controller = new LoginController(_context)
         {
-            ControllerContext = new ControllerContext
-            {
-                HttpContext = _mockHttpContext.Object
-            }
+            ControllerContext = new ControllerContext { HttpContext = _httpContext }
         };
-
-        SeedTestData();
     }
 
-    private void SeedTestData()
-    {
-        // Check if data already exists
-        if (!_context.Logins.Any())
-        {
-            // Add test data directly to the in-memory database
-            var customer = new Customer
-            {
-                CustomerID = 2100,
-                Name = "Matthew Bolger",
-                
-                Login = new Login
-                {
-                    LoginID = "1234567",
-                    PasswordHash = new SimpleHash().Compute("abc111"),
-                    CustomerID = 2100
-                }
-            };
-
-            _context.Customers.Add(customer);
-            _context.SaveChanges();
-        }
-    }
 
     public void Dispose()
     {
@@ -73,7 +45,7 @@ public class LoginControllerTests : IDisposable
     public async Task Login_Successful_RedirectsToCustomerIndex()
     {
         // Arrange
-        var loginID = "1234567"; // Valid login ID
+        var loginID = "12345678"; // Valid login ID
         var password = "abc111";  // Valid password
 
         // Act
